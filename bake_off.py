@@ -59,7 +59,7 @@ class BakeryGame:
         # Load Star Sprite
         try:
             self.star_img = pygame.image.load("star_sprite.png")
-            self.star_img = pygame.transform.scale(self.star_img, (40, 40))
+            self.star_img = pygame.transform.scale(self.star_img, (80, 80))
         except:
             self.star_img = None
 
@@ -74,7 +74,7 @@ class BakeryGame:
             
             # Easy Mode Filtering
             if self.difficulty == "easy":
-                keywords = ["cake", "pie", "pancake", "cookie", "pudding", "brownie", "donut", "ice cream", "apple", "banana", "strawberry"]
+                keywords = ["cake", "pie", "cookie", "pudding", "brownie", "donut", "ice cream"]
                 easy_meals = [m for m in meals if any(k in m['strMeal'].lower() for k in keywords)]
                 if easy_meals:
                     meals = easy_meals
@@ -348,11 +348,13 @@ class BakeryGame:
             screen.blit(scaled_score, (850, 640))
 
         elif self.state == GameState.RESULT:
-            # Center the image
-            img_x = (WIN_WIDTH - 450) // 2
-            img_y = 50
-            screen.blit(self.image, (img_x, img_y))
-            pygame.draw.rect(screen, BROWN, (img_x, img_y, 450, 450), 4)
+            # Center and scale image slightly smaller for results
+            res_img_size = 350
+            scaled_img = pygame.transform.scale(self.image, (res_img_size, res_img_size))
+            img_x = (WIN_WIDTH - res_img_size) // 2
+            img_y = 40
+            screen.blit(scaled_img, (img_x, img_y))
+            pygame.draw.rect(screen, BROWN, (img_x, img_y, res_img_size, res_img_size), 4)
             
             # Display result message
             res_txt = UI_FONT.render(self.result_message, True, BROWN)
@@ -361,17 +363,18 @@ class BakeryGame:
                 res_txt = pygame.transform.scale(res_txt, (int(res_txt.get_width() * ratio), int(res_txt.get_height() * ratio)))
             
             res_x = (WIN_WIDTH - res_txt.get_width()) // 2
-            res_y = img_y + 450 + 20
+            res_y = img_y + res_img_size + 40
             
             if self.is_winner and self.star_img:
-                # Draw stars on either side
-                screen.blit(self.star_img, (res_x - 50, res_y - 5))
-                screen.blit(self.star_img, (res_x + res_txt.get_width() + 10, res_y - 5))
+                # Draw stars on either side (now bigger)
+                star_y = res_y + (res_txt.get_height() // 2) - 40
+                screen.blit(self.star_img, (res_x - 100, star_y))
+                screen.blit(self.star_img, (res_x + res_txt.get_width() + 20, star_y))
             
             screen.blit(res_txt, (res_x, res_y))
             
             self.btn_next = self.draw_button("Bake Another!", 350, res_y + 60, 300, 60, PASTEL_GREEN)
-            self.btn_quit = self.draw_button("Close Shop", 350, res_y + 130, 300, 60, GRAY)
+            self.btn_quit = self.draw_button("Close Shop", 350, res_y + 140, 300, 60, GRAY)
 
         pygame.display.flip()
 
